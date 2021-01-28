@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
 	//char   *c_pass; //you might want to use this variable later...
 	char prompt[] = "password: ";
 	char *user_pass;
+	char *crypt_user_pass;
 
 	sighandler();
 
@@ -79,7 +80,9 @@ int main(int argc, char *argv[]) {
 //		passwddata = getpwnam(user);
         passwddata = mygetpwnam(user);
 
-		if (passwddata != NULL && !strcmp(user_pass, passwddata->passwd)) {
+        crypt_user_pass = crypt(user_pass, passwddata->passwd_salt);
+
+		if (passwddata != NULL && !strcmp(crypt_user_pass, passwddata->passwd)) {
 			/* You have to encrypt user_pass for this to work */
 			/* Don't forget to include the salt */
 
