@@ -68,7 +68,6 @@ int main(int argc, char *argv[]) {
             }
         }
 
-
 		/* check to see if important variable is intact after input of login name - do not remove */
 		printf("Value of variable 'important 1' after input of login name: %*.*s\n",
 				LENGTH - 1, LENGTH - 1, important1);
@@ -77,10 +76,14 @@ int main(int argc, char *argv[]) {
 
 		user_pass = getpass(prompt);
 		printf("PASSWORD: '%s'\n", user_pass);
-//		passwddata = getpwnam(user);
         passwddata = mygetpwnam(user);
 
         crypt_user_pass = crypt(user_pass, passwddata->passwd_salt);
+
+        if (passwddata != NULL && passwddata->pwfailed >= 3) {
+            printf("Too many incorrect passwords, please contact a system administrator to reset the password.\n");
+            exit(0);
+        }
 
 		if (passwddata != NULL && !strcmp(crypt_user_pass, passwddata->passwd)) {
 			/* You have to encrypt user_pass for this to work */
