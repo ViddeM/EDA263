@@ -53,8 +53,20 @@ int main(int argc, char *argv[]) {
 		fflush(NULL); /* Flush all  output buffers */
 		__fpurge(stdin); /* Purge any data in stdin buffer */
 
-		if (gets(user) == NULL) /* gets() is vulnerable to buffer */
-			exit(0); /*  overflow attacks.  */
+		if (fgets(user, LENGTH, stdin) == NULL)
+		    exit(0);
+
+//        if (gets(user) == NULL)
+//            exit(0);
+
+        for (int i = 0; i < LENGTH; i++) {
+            char c = user[i];
+            if (c == 10) {
+                // Replace newline with NULL
+                user[i] = 0;
+            }
+        }
+
 
 		/* check to see if important variable is intact after input of login name - do not remove */
 		printf("Value of variable 'important 1' after input of login name: %*.*s\n",
@@ -63,6 +75,7 @@ int main(int argc, char *argv[]) {
 		 		LENGTH - 1, LENGTH - 1, important2);
 
 		user_pass = getpass(prompt);
+		printf("PASSWORD: '%s'\n", user_pass);
 //		passwddata = getpwnam(user);
         passwddata = mygetpwnam(user);
 
