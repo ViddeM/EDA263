@@ -79,19 +79,22 @@ int main(int argc, char *argv[]) {
 //		passwddata = getpwnam(user);
         passwddata = mygetpwnam(user);
 
-		if (passwddata != NULL) {
+		if (passwddata != NULL && !strcmp(user_pass, passwddata->passwd)) {
 			/* You have to encrypt user_pass for this to work */
 			/* Don't forget to include the salt */
-			if (!strcmp(user_pass, passwddata->passwd)) {
 
-				printf(" You're in !\n");
+            printf(" You're in ! After %d tries\n", passwddata->pwfailed + 1);
+            passwddata->pwfailed = 0;
+            mysetpwent(user, passwddata);
 
-				/*  check UID, see setuid(2) */
-				/*  start a shell, use execve(2) */
+            /*  check UID, see setuid(2) */
+            /*  start a shell, use execve(2) */
 
-			}
-		}
-		printf("Login Incorrect \n");
+        } else {
+            printf("Login Incorrect \n");
+            passwddata->pwfailed += 1;
+            mysetpwent(user, passwddata);
+        }
 	}
 	return 0;
 }
