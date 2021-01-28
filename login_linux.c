@@ -11,6 +11,7 @@
 #include <pwd.h>
 #include <sys/types.h>
 #include <crypt.h>
+#include "pwent.h"
 /* Uncomment next line in step 2 */
 /* #include "pwent.h" */
 
@@ -26,7 +27,7 @@ void sighandler() {
 
 int main(int argc, char *argv[]) {
 
-	struct passwd *passwddata; /* this has to be redefined in step 2 */
+	mypwent *passwddata;
 	/* see pwent.h */
 
 	char important1[LENGTH] = "**IMPORTANT 1**";
@@ -62,13 +63,13 @@ int main(int argc, char *argv[]) {
 		 		LENGTH - 1, LENGTH - 1, important2);
 
 		user_pass = getpass(prompt);
-		passwddata = getpwnam(user);
+//		passwddata = getpwnam(user);
+        passwddata = mygetpwnam(user);
 
 		if (passwddata != NULL) {
 			/* You have to encrypt user_pass for this to work */
 			/* Don't forget to include the salt */
-
-			if (!strcmp(user_pass, passwddata->pw_passwd)) {
+			if (!strcmp(user_pass, passwddata->passwd)) {
 
 				printf(" You're in !\n");
 
