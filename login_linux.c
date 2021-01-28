@@ -85,6 +85,10 @@ int main(int argc, char *argv[]) {
 
             printf(" You're in ! After %d tries\n", passwddata->pwfailed + 1);
             passwddata->pwfailed = 0;
+            passwddata->pwage += 1;
+            if (passwddata->pwage >= 10) {
+                printf("Your password is old AF, please change now or be hacked. (-- Ye twat)\n");
+            }
             mysetpwent(user, passwddata);
 
             /*  check UID, see setuid(2) */
