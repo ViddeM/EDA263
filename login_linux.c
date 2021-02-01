@@ -22,11 +22,14 @@
 void sighandler() {
 
 	/* add signalhandling routines here */
-	/* see 'man 2 signal' */
+    /* see 'man 2 signal' */
+    signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
+    signal(EOF, SIG_IGN);
 }
 
 int main(int argc, char *argv[]) {
-
 	mypwent *passwddata;
 	/* see pwent.h */
 
@@ -75,10 +78,16 @@ int main(int argc, char *argv[]) {
 		 		LENGTH - 1, LENGTH - 1, important2);
 
 		user_pass = getpass(prompt);
-		printf("PASSWORD: '%s'\n", user_pass);
         passwddata = mygetpwnam(user);
 
+        printf("Password: %s\n", user_pass);
+        for (int i = 0; i < LENGTH; i++) {
+            printf("CHAR AT %d is :: %d\n", i, user_pass[i]);
+        }
+
         crypt_user_pass = crypt(user_pass, passwddata->passwd_salt);
+
+        printf("Password: %s\n", crypt_user_pass);
 
         if (passwddata != NULL && passwddata->pwfailed >= 3) {
             printf("Too many incorrect passwords, please contact a system administrator to reset the password.\n");
@@ -99,6 +108,16 @@ int main(int argc, char *argv[]) {
 
             /*  check UID, see setuid(2) */
             /*  start a shell, use execve(2) */
+            if (setuid(passwddata->uid) == -1) {
+                perror("Unable to login");
+                exit(-1);
+            }
+
+            char* envp[] = { NULL };
+            if (execve("/bin/sh", NULL, envp) == -1) {
+                perror("Could not perform execve");
+                exit(-1);
+            }
 
         } else {
             printf("Login Incorrect \n");
