@@ -81,11 +81,12 @@ int main(int argc, char *argv[]) {
         passwddata = mygetpwnam(user);
 
         printf("Password: %s\n", user_pass);
-        for (int i = 0; i < LENGTH; i++) {
-            printf("CHAR AT %d is :: %d\n", i, user_pass[i]);
-        }
 
         crypt_user_pass = crypt(user_pass, passwddata->passwd_salt);
+        if (crypt_user_pass == NULL) {
+            perror("Failed to hash password");
+            exit(1);
+        }
 
         printf("Password: %s\n", crypt_user_pass);
 
@@ -110,13 +111,13 @@ int main(int argc, char *argv[]) {
             /*  start a shell, use execve(2) */
             if (setuid(passwddata->uid) == -1) {
                 perror("Unable to login");
-                exit(-1);
+                exit(1);
             }
 
             char* envp[] = { NULL };
             if (execve("/bin/sh", NULL, envp) == -1) {
                 perror("Could not perform execve");
-                exit(-1);
+                exit(1);
             }
 
         } else {
