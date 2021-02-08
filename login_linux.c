@@ -80,8 +80,10 @@ int main(int argc, char *argv[]) {
 		user_pass = getpass(prompt);
         passwddata = mygetpwnam(user);
 
-        printf("Password: %s\n", user_pass);
-
+        if (passwddata == NULL) {
+            printf("User does not exist\n");
+            continue;
+        }
         crypt_user_pass = crypt(user_pass, passwddata->passwd_salt);
         if (crypt_user_pass == NULL) {
             perror("Failed to hash password");
@@ -92,18 +94,18 @@ int main(int argc, char *argv[]) {
 
         if (passwddata != NULL && passwddata->pwfailed >= 3) {
             printf("Too many incorrect passwords, please contact a system administrator to reset the password.\n");
-            exit(0);
+            // TODO: Don't exit, just go back to loop so another user can login.
+            continue;
         }
 
 		if (passwddata != NULL && !strcmp(crypt_user_pass, passwddata->passwd)) {
 			/* You have to encrypt user_pass for this to work */
 			/* Don't forget to include the salt */
 
-            printf(" You're in ! After %d tries\n", passwddata->pwfailed + 1);
             passwddata->pwfailed = 0;
             passwddata->pwage += 1;
             if (passwddata->pwage >= 10) {
-                printf("Your password is old AF, please change now or be hacked. (-- Ye twat)\n");
+                printf("You are using an old password, please consider updating it.\n");
             }
             mysetpwent(user, passwddata);
 
